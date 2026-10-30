@@ -1,0 +1,13 @@
+import { useEffect,useState } from "react";
+import { RotateCcw, CheckCircle2 } from "lucide-react";
+import PageHeader from "../components/PageHeader";
+import Status from "../components/Status";
+import {getBooks,getMembers,getTransactions,updateTransaction,updateBook} from "../services/api";
+export default function ReturnBook(){
+ const [rows,setRows]=useState([]),[books,setBooks]=useState([]),[members,setMembers]=useState([]),[error,setError]=useState(""),[message,setMessage]=useState(""),[busy,setBusy]=useState("");
+ const load=()=>Promise.all([getBooks(),getMembers(),getTransactions()]).then(([b,m,t])=>{setBooks(b);setMembers(m);setRows(t.filter(x=>x.status==="Issued"))}).catch(()=>setError("Unable to load active issues. Check JSON Server."));
+ useEffect(()=>{load()},[]);
+ const name=(list,id,key)=>list.find(x=>x.id===id)?.[key]||"Record unavailable";
+ const doReturn=async t=>{if(!confirm(`Confirm return of "${name(books,t.bookId,"title")}"?`))return;setBusy(t.id);setError("");setMessage("");try{await updateTransaction(t.id,{...t,status:"Returned",returnDate:new Date().toISOString().slice(0,10)});const book=books.find(b=>b.id===t.bookId);if(book)await updateBook(book.id,{...book,status:"Available"});setMessage("Book returned successfully. Availability has been updated.");await load()}catch{setError("Return operation failed. Please try again.")}finally{setBusy("")}};
+ return <><PageHeader title="Return books" description="Process returned books and make them available again."/>{message&&<div className="success-alert page-alert"><CheckCircle2 size={18}/>{message}</div>}{error&&<div className="alert page-alert">{error}</div>}<section className="panel"><div className="list-toolbar"><div><h2>Active book issues <span className="count">{rows.length}</span></h2><p>Books currently with library members</p></div></div>{rows.length?<div className="table-wrap"><table><thead><tr><th>BOOK</th><th>MEMBER</th><th>ISSUED ON</th><th>DUE DATE</th><th>STATUS</th><th className="align-right">ACTION</th></tr></thead><tbody>{rows.map(t=><tr key={t.id}><td><strong>{name(books,t.bookId,"title")}</strong><small className="table-sub">{name(books,t.bookId,"author")}</small></td><td>{name(members,t.memberId,"name")}</td><td>{t.issueDate}</td><td>{t.dueDate}</td><td><Status value={t.status}/></td><td><button className="button button-small button-primary" disabled={busy===t.id} onClick={()=>doReturn(t)}><RotateCcw size={14}/>{busy===t.id?"Returning...":"Return"}</button></td></tr>)}</tbody></table></div>:<div className="empty-state"><CheckCircle2 size={25}/><strong>All caught up</strong><span>There are no books waiting to be returned.</span></div>}</section></>;
+}

@@ -1,0 +1,12 @@
+import {useEffect,useState} from "react";
+import {Search,History} from "lucide-react";
+import PageHeader from "../components/PageHeader";
+import Status from "../components/Status";
+import {getBooks,getMembers,getTransactions} from "../services/api";
+export default function Transactions(){
+ const [books,setBooks]=useState([]),[members,setMembers]=useState([]),[transactions,setTransactions]=useState([]),[query,setQuery]=useState(""),[filter,setFilter]=useState("All"),[error,setError]=useState("");
+ useEffect(()=>{Promise.all([getBooks(),getMembers(),getTransactions()]).then(([b,m,t])=>{setBooks(b);setMembers(m);setTransactions(t)}).catch(()=>setError("Unable to load transactions. Check JSON Server."))},[]);
+ const lookup=(list,id,key)=>list.find(x=>x.id===id)?.[key]||"Record unavailable";
+ const filtered=transactions.filter(t=>(filter==="All"||t.status===filter)&&`${lookup(books,t.bookId,"title")} ${lookup(members,t.memberId,"name")}`.toLowerCase().includes(query.toLowerCase())).sort((a,b)=>b.issueDate.localeCompare(a.issueDate));
+ return <><PageHeader title="Transactions" description="A complete history of book issue and return activity."/>{error&&<div className="alert">{error}</div>}<section className="panel"><div className="list-toolbar"><div><h2>Circulation history <span className="count">{transactions.length}</span></h2><p>Track every issue and return</p></div><div className="toolbar-controls"><div className="search-box"><Search size={17}/><input placeholder="Search transactions..." value={query} onChange={e=>setQuery(e.target.value)}/></div><select className="filter-select" value={filter} onChange={e=>setFilter(e.target.value)}><option>All</option><option>Issued</option><option>Returned</option></select></div></div>{filtered.length?<div className="table-wrap"><table><thead><tr><th>BOOK</th><th>MEMBER</th><th>ISSUE DATE</th><th>DUE DATE</th><th>RETURN DATE</th><th>STATUS</th></tr></thead><tbody>{filtered.map(t=><tr key={t.id}><td><strong>{lookup(books,t.bookId,"title")}</strong></td><td>{lookup(members,t.memberId,"name")}</td><td>{t.issueDate}</td><td>{t.dueDate}</td><td>{t.returnDate||"—"}</td><td><Status value={t.status}/></td></tr>)}</tbody></table></div>:<div className="empty-state"><History size={25}/><strong>No matching transactions</strong><span>Try changing your search or status filter.</span></div>}</section></>;
+}

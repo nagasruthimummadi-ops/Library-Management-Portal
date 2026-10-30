@@ -1,0 +1,67 @@
+{
+  "books": [
+    {
+      "id": "1",
+      "title": "Atomic Habits",
+      "author": "James Clear",
+      "isbn": "9780735211292",
+      "category": "Self-help",
+      "status": "Available"
+    },
+    {
+      "id": "2",
+      "title": "The Alchemist",
+      "author": "Paulo Coelho",
+      "isbn": "9780061122415",
+      "category": "Fiction",
+      "status": "Issued"
+    },
+    {
+      "id": "3",
+      "title": "Clean Code",
+      "author": "Robert C. Martin",
+      "isbn": "9780132350884",
+      "category": "Technology",
+      "status": "Available"
+    },
+    {
+      "id": "4",
+      "title": "Wings of Fire",
+      "author": "A. P. J. Abdul Kalam",
+      "isbn": "9788173711466",
+      "category": "Biography",
+      "status": "Available"
+    }
+  ],
+  "members": [
+    {
+      "id": "1",
+      "name": "Ananya Rao",
+      "email": "ananya@example.com",
+      "phone": "9876543210"
+    },
+    {
+      "id": "2",
+      "name": "Rahul Sharma",
+      "email": "rahul@example.com",
+      "phone": "9876501234"
+    },
+    {
+      "id": "3",
+      "name": "Priya Reddy",
+      "email": "priya@example.com",
+      "phone": "9123456780"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "1",
+      "bookId": "2",
+      "memberId": "1",
+      "issueDate": "2026-10-25",
+      "dueDate": "2026-11-08",
+      "returnDate": "",
+      "status": "Issued"
+    }
+  ]
+}

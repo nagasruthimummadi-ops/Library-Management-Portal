@@ -1,0 +1,1 @@
+export default function Status({value}) { return <span className={`status ${value === "Available" || value === "Returned" ? "status-green" : "status-amber"}`}><i/>{value}</span>; }
